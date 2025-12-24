@@ -2,41 +2,72 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Un regalo para ti</title>
+  <title>Para ti 🌹</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <style>
     body {
       margin: 0;
+      min-height: 100vh;
       font-family: 'Georgia', serif;
-      background: url('https://images.unsplash.com/photo-1501004318641-b39e6451bec6') center/cover no-repeat;
-      color: white;
-      text-align: center;
-      padding: 60px 20px;
+      background: 
+        linear-gradient(rgba(0,0,0,0.45), rgba(0,0,0,0.45)),
+        url("https://images.unsplash.com/photo-1509042239860-f550ce710b93");
+      background-size: cover;
+      background-position: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
     }
+
     .card {
-      background: rgba(0,0,0,0.55);
-      max-width: 500px;
-      margin: auto;
-      padding: 40px;
-      border-radius: 20px;
+      background: rgba(0, 0, 0, 0.55);
+      padding: 40px 30px;
+      max-width: 420px;
+      border-radius: 22px;
+      text-align: center;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.5);
     }
+
+    h1 {
+      font-weight: normal;
+      margin-bottom: 20px;
+      font-size: 2em;
+    }
+
+    p {
+      line-height: 1.6;
+      font-size: 1.05em;
+    }
+
     a {
       display: inline-block;
-      margin-top: 25px;
-      padding: 14px 28px;
-      background: #f5c2c7;
-      color: #000;
+      margin-top: 30px;
+      padding: 14px 32px;
+      background: #e63946;
+      color: white;
       text-decoration: none;
       border-radius: 30px;
-      font-size: 18px;
+      font-size: 1.1em;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    a:hover {
+      transform: scale(1.05);
+      box-shadow: 0 8px 20px rgba(230,57,70,0.6);
     }
   </style>
 </head>
+
 <body>
   <div class="card">
-    <h1>Para ti 💖</h1>
+    <h1>Para ti 🌹</h1>
+
     <p>
-      Este pequeño rincón fue creado con amor.  
-      Cada imagen y cada sonido llevan un recuerdo para ti.
+      Este pequeño rincón fue creado con amor.<br>
+      Cada rosa guarda un recuerdo,<br>
+      y cada recuerdo lleva mi cariño para ti.
     </p>
 
     <a href="https://drive.google.com/file/d/1KuLxXRUdEaMtHA5A4liRbs3f9jiqV380/view?usp=sharing" target="_blank">
@@ -45,3 +76,4 @@
   </div>
 </body>
 </html>
+
