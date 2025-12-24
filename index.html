@@ -10,7 +10,7 @@
       margin: 0;
       min-height: 100vh;
       font-family: 'Georgia', serif;
-      background: 
+      background:
         linear-gradient(rgba(0,0,0,0.45), rgba(0,0,0,0.45)),
         url("https://images.unsplash.com/photo-1509042239860-f550ce710b93");
       background-size: cover;
@@ -19,15 +19,73 @@
       align-items: center;
       justify-content: center;
       color: #fff;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* Capa para pétalos y luces */
+    .fx-layer {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      overflow: hidden;
+      z-index: 0;
+    }
+
+    /* Lucecitas */
+    .sparkle {
+      position: absolute;
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.85);
+      filter: blur(0.2px);
+      animation: sparkleFloat linear infinite, sparkleBlink ease-in-out infinite;
+      opacity: 0.7;
+    }
+
+    @keyframes sparkleFloat {
+      0% { transform: translateY(110vh) translateX(0) scale(1); }
+      100% { transform: translateY(-15vh) translateX(40px) scale(1.15); }
+    }
+    @keyframes sparkleBlink {
+      0%, 100% { opacity: 0.25; }
+      50% { opacity: 0.9; }
+    }
+
+    /* Pétalos */
+    .petal {
+      position: absolute;
+      width: 18px;
+      height: 12px;
+      background: rgba(255, 180, 200, 0.75);
+      border-radius: 12px 12px 12px 0;
+      transform: rotate(20deg);
+      filter: blur(0.1px);
+      box-shadow: 0 0 10px rgba(255,180,200,0.25);
+      animation: petalFall linear infinite, petalSway ease-in-out infinite;
+      opacity: 0.85;
+    }
+
+    @keyframes petalFall {
+      0% { transform: translateY(-15vh) rotate(0deg); }
+      100% { transform: translateY(110vh) rotate(220deg); }
+    }
+    @keyframes petalSway {
+      0%, 100% { margin-left: 0px; }
+      50% { margin-left: 40px; }
     }
 
     .card {
+      position: relative;
+      z-index: 1;
       background: rgba(0, 0, 0, 0.55);
       padding: 40px 30px;
       max-width: 420px;
       border-radius: 22px;
       text-align: center;
       box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+      backdrop-filter: blur(2px);
     }
 
     h1 {
@@ -41,8 +99,64 @@
       font-size: 1.05em;
     }
 
+    .pin-area {
+      margin-top: 25px;
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+
+    .pin-area.hidden {
+      opacity: 0;
+      transform: translateY(10px);
+      pointer-events: none;
+      height: 0;
+      overflow: hidden;
+    }
+
+    input {
+      margin-top: 0;
+      padding: 12px;
+      width: 80%;
+      border-radius: 20px;
+      border: none;
+      text-align: center;
+      font-size: 1.1em;
+      outline: none;
+    }
+
+    button {
+      margin-top: 18px;
+      padding: 10px 26px;
+      border-radius: 25px;
+      border: none;
+      font-size: 1em;
+      cursor: pointer;
+      background: #f1faee;
+      color: #333;
+    }
+
+    .error {
+      margin-top: 15px;
+      color: #ffd6d6;
+      font-size: 0.95em;
+      display: none;
+    }
+
+    .mensaje {
+      display: none;
+      margin-top: 20px;
+      font-size: 1.1em;
+      color: #ffecec;
+      opacity: 0;
+      transition: opacity 1s ease;
+    }
+
+    .mensaje.show {
+      display: block;
+      opacity: 1;
+    }
+
     a {
-      display: inline-block;
+      display: none;
       margin-top: 30px;
       padding: 14px 32px;
       background: #e63946;
@@ -50,7 +164,15 @@
       text-decoration: none;
       border-radius: 30px;
       font-size: 1.1em;
-      transition: transform 0.2s, box-shadow 0.2s;
+      transform: scale(0.95);
+      opacity: 0;
+      transition: opacity 0.8s ease, transform 0.8s ease, box-shadow 0.2s;
+    }
+
+    a.show {
+      display: inline-block;
+      opacity: 1;
+      transform: scale(1);
     }
 
     a:hover {
@@ -61,6 +183,9 @@
 </head>
 
 <body>
+  <!-- Efectos mágicos -->
+  <div class="fx-layer" id="fxLayer"></div>
+
   <div class="card">
     <h1>Para ti 🌹</h1>
 
@@ -70,10 +195,96 @@
       y cada recuerdo lleva mi cariño para ti.
     </p>
 
-    <a href="https://drive.google.com/file/d/1KuLxXRUdEaMtHA5A4liRbs3f9jiqV380/view?usp=sharing" target="_blank">
+    <!-- PIN -->
+    <div class="pin-area" id="pinArea">
+      <input type="password" id="pin" placeholder="Ingresa el PIN" inputmode="numeric">
+      <br>
+      <button id="btnDesbloquear" onclick="verificarPIN()">Desbloquear</button>
+
+      <div class="error" id="error">
+        PIN incorrecto 💔
+      </div>
+    </div>
+
+    <!-- Mensaje -->
+    <div class="mensaje" id="mensaje">
+      Jessica ❤️<br>
+      Gracias por estar siempre.<br>
+      Este video es un pedacito de mi corazón para ti.
+    </div>
+
+    <!-- Video -->
+    <a id="videoBtn"
+       href="https://drive.google.com/file/d/1KuLxXRUdEaMtHA5A4liRbs3f9jiqV380/view?usp=sharing"
+       target="_blank">
       ▶ Ver el video
     </a>
   </div>
+
+  <script>
+    // === PIN con Enter ===
+    const pinInput = document.getElementById("pin");
+    pinInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") verificarPIN();
+    });
+
+    function verificarPIN() {
+      const pinCorrecto = "1950";
+      const pinIngresado = pinInput.value.trim();
+      const pinArea = document.getElementById("pinArea");
+      const botonVideo = document.getElementById("videoBtn");
+      const mensaje = document.getElementById("mensaje");
+      const error = document.getElementById("error");
+
+      if (pinIngresado === pinCorrecto) {
+        pinArea.classList.add("hidden");
+        error.style.display = "none";
+
+        setTimeout(() => {
+          mensaje.classList.add("show");
+          botonVideo.classList.add("show");
+        }, 600);
+      } else {
+        error.style.display = "block";
+      }
+    }
+
+    // === Pétalos + luces animadas ===
+    const fxLayer = document.getElementById("fxLayer");
+
+    function rand(min, max) {
+      return Math.random() * (max - min) + min;
+    }
+
+    function createSparkles(count = 22) {
+      for (let i = 0; i < count; i++) {
+        const s = document.createElement("div");
+        s.className = "sparkle";
+        s.style.left = rand(0, 100) + "vw";
+        s.style.top = rand(0, 100) + "vh";
+        s.style.animationDuration = rand(6, 14) + "s, " + rand(1.8, 3.6) + "s";
+        s.style.animationDelay = rand(0, 6) + "s, " + rand(0, 2) + "s";
+        s.style.transform = `scale(${rand(0.7, 1.4)})`;
+        fxLayer.appendChild(s);
+      }
+    }
+
+    function createPetals(count = 14) {
+      for (let i = 0; i < count; i++) {
+        const p = document.createElement("div");
+        p.className = "petal";
+        p.style.left = rand(0, 100) + "vw";
+        p.style.top = rand(-40, 0) + "vh";
+        p.style.animationDuration = rand(8, 16) + "s, " + rand(2.5, 4.5) + "s";
+        p.style.animationDelay = rand(0, 8) + "s, " + rand(0, 2) + "s";
+        p.style.opacity = rand(0.55, 0.95);
+        p.style.transform = `rotate(${rand(0, 60)}deg) scale(${rand(0.8, 1.35)})`;
+        fxLayer.appendChild(p);
+      }
+    }
+
+    createSparkles(24);
+    createPetals(16);
+  </script>
 </body>
 </html>
-
